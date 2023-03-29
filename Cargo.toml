@@ -1,0 +1,16 @@
+[package]
+name = "srun-rust"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+curl = "0.4.44"
+default-net = "0.14.1"
+hmac = "0.12.1"
+md5 = "0.7.0"
+regex = "1.7.3"
+rust-crypto = "0.2.36"
+sha1 = "0.10.5"
+urlencoding = "2.1.2"
