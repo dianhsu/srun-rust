@@ -1,19 +1,43 @@
+mod client;
+mod config;
 mod srun;
+mod tool;
+use core::time;
+use std::fs::File;
+use std::thread::sleep;
+
+use daemonize::Daemonize;
+use simple_logger::SimpleLogger;
+
+fn run(config_path: &str) {
+    let run_config = config::Config::load(config_path);
+    println!("{:#}", serde_yaml::to_string(&run_config).unwrap());
+    let mut client = client::Client::new();
+    client.add_auth(run_config);
+    client.login_all();
+}
 fn main() {
-    let login_info = srun::LoginInfo {
-        callback: "jsonp1583251661368".to_string(),
-        action: "login".to_string(),
-        username: "202013703018".to_string(),
-        password: "xudian1234..".to_string(),
-        ac_id: "7".to_string(),
-        enc: "srun_bx1".to_string(),
-        info: "".to_string(),
-        chksum: "".to_string(),
-        n: "".to_string(),
-        vtype: "".to_string(),
-        interface: "".to_string(), 
-        host: "".to_string(),
-        https: false
-    };
-    login_info.login();
+    SimpleLogger::new().init().unwrap();
+    // let stdout = File::create("/tmp/srun.out").unwrap();
+    // let stderr = File::create("/tmp/srun.err").unwrap();
+    // let daemonize = Daemonize::new()
+    //     .pid_file("/var/run/srun/srun.pid") // Every method except `new` and `start`
+    //     .chown_pid_file(true)
+    //     .working_directory("/tmp") // for default behaviour.
+    //     .stdout(stdout)
+    //     .stderr(stderr)
+    //     .privileged_action(|| "Executed before drop privileges");
+
+    // match daemonize.start() {
+    //     Ok(_) => {
+    //         println!("Success, daemonized");
+    //         loop {
+    //             sleep(time::Duration::from_secs(5));
+    //             println!("Check")
+    //         }
+    //     }
+    //     Err(e) => eprintln!("Error, {}", e),
+    //
+    let config_path = "./config.yaml";
+    run(config_path);
 }

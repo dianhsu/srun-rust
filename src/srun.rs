@@ -1,4 +1,12 @@
+mod base64;
+mod md5;
+mod sha1;
+mod xencode;
+use self::base64::get_base64;
+use self::md5::get_md5;
 use regex::Regex;
+use self::sha1::get_sha1;
+use xencode::get_xencode;
 #[derive(Debug, Clone)]
 pub struct LoginInfo {
     pub callback: String,
@@ -18,6 +26,7 @@ pub struct LoginInfo {
 
 use curl::easy::{Easy2, Handler, List, WriteError};
 
+use crate::tool::rand_str;
 struct Collector(Vec<u8>);
 
 impl Handler for Collector {
@@ -32,40 +41,82 @@ pub fn request(url: &str, interface: &str) -> String {
     if !interface.is_empty() {
         easy.interface(interface).expect("");
     }
+    log::info!("request: {}", url);
     easy.get(true).unwrap();
     easy.url(url).unwrap();
     let mut list = List::new();
     list.append("User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.26 Safari/537.36").unwrap();
     easy.http_headers(list).unwrap();
-    easy.perform().unwrap();
+    match easy.perform(){
+        Ok(_) => {}
+        Err(e) => {
+            log::error!("request error: {}", e);
+            return String::from("");
+        }
+    }
     let contents = easy.get_ref();
-    return String::from_utf8_lossy(&contents.0).to_string();
+    let res = String::from_utf8_lossy(&contents.0).to_string();
+    log::info!("response: {}", res);
+    return res
 }
 impl LoginInfo {
-    pub fn _send_login_info(self, ip: &str) -> String {
-        let url = format!("{}://{}/cgi-bin/srun_protal?callback={}&action={}&username={}&password={}&ac_id={}&ip={}&info={}&chksum={}&n={}&type={}&os=Windows 10&name=windows&double_stack=0",
+    pub fn new(
+        username: &str,
+        password: &str,
+        host: &str,
+        ac_id: &str,
+        enc: &str,
+        n: &str,
+        vtype: &str,
+        https: bool,
+        interface: &str,
+    ) -> Self {
+        let callback = "jQuery".to_string() + &rand_str();
+        let action = "login";
+        let info = "";
+        let chksum = "";
+        LoginInfo {
+            callback: callback,
+            action: action.to_string(),
+            username: username.to_string(),
+            password: password.to_string(),
+            ac_id: ac_id.to_string(),
+            enc: enc.to_string(),
+            info: info.to_string(),
+            chksum: chksum.to_string(),
+            n: n.to_string(),
+            vtype: vtype.to_string(),
+            interface: interface.to_string(),
+            host: host.to_string(),
+            https: https,
+        }
+    }
+    pub fn _send_login_info(&self, ip: &str) -> String {
+        let url = format!("{}://{}/cgi-bin/srun_protal?callback={}&action={}&username={}&password={}&ac_id={}&ip={}&info={}&chksum={}&n={}&type={}&os=Windows+10&name=windows&double_stack=0",
         (if self.https {"https"} else {"http"}),
         self.host, self.callback, self.action, self.username, self.password, self.ac_id, ip,self.info,self.chksum,self.n,self.vtype);
         request(url.as_str(), "")
     }
-    pub fn login(self) -> String {
+    pub fn login(&mut self) -> (String, bool) {
         let ip = self.clone().get_ip();
+        log::info!("ip: {}", ip);
         let token = self.clone().get_token(ip.as_str());
         let login_response = self.get_login_response(token.as_str(), ip.as_str());
         return login_response;
     }
-    pub fn get_login_response(self, token: &str, ip: &str) -> String {
+    pub fn get_login_response(&self, token: &str, ip: &str) -> (String, bool) {
         self.clone()._generate_encrypted_login_info(token, ip);
         let login_response = self._send_login_info(ip);
         let login_result = Self::_resolve_login_response(login_response.as_str());
         return login_result;
     }
-    fn _resolve_login_response(page_text: &str) -> String {
+    fn _resolve_login_response(page_text: &str) -> (String, bool) {
+        log::info!("login response: {}", page_text);
         let re = Regex::new("\"suc_msg\":\"(.*?)\"").unwrap();
         for cap in re.captures_iter(page_text) {
-            return cap[1].to_string();
+            return (cap[1].to_string(), true);
         }
-        return "".to_string();
+        return ("".to_string(), false);
     }
     fn get_ip(self) -> String {
         let page_text = self._get_login_page();
@@ -74,9 +125,10 @@ impl LoginInfo {
     }
     fn _get_login_page(self) -> String {
         let url_login_page = format!(
-            "{}://{}/srun_portal_pc?ac_id=8&theme=bit",
+            "{}://{}/srun_portal_pc?ac_id={}&theme=pro",
             (if self.https { "https" } else { "http" }),
-            self.host
+            self.host,
+            self.ac_id,
         );
         return request(url_login_page.as_str(), &self.interface);
     }
@@ -156,18 +208,4 @@ impl LoginInfo {
     fn _encrypt_chksum(chksum: &str) -> String {
         return get_sha1(chksum);
     }
-}
-
-pub fn get_md5(_password: &str, _token: &str) -> String {
-    unimplemented!()
-}
-
-pub fn get_sha1(_value: &str) -> String {
-    unimplemented!()
-}
-pub fn get_base64(_s: &str) -> String {
-    unimplemented!()
-}
-pub fn get_xencode(_msg: &str, _key: &str) -> String {
-    unimplemented!()
 }
