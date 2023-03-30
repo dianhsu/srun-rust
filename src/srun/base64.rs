@@ -48,3 +48,13 @@ pub fn get_base64(value: &str) -> String {
 
     crazy_engine.encode(value)
 }
+
+
+#[cfg(test)]
+mod tests{
+    #[test]
+    fn test_get_base64(){
+        assert_eq!(crate::srun::base64::get_base64("132456"), "9F9x0JHI");
+        assert_eq!(crate::srun::base64::get_base64("1234567890"), "9F2z0JHI0zSe9L==");
+    }
+}

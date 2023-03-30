@@ -23,7 +23,8 @@ pub struct Basic {
 pub struct Config {
     pub basic: Basic,
     pub accounts: Vec<Account>,
-    daemon: bool,
+    pub daemon: bool,
+    pub log_path: String,
 }
 
 impl Config {
@@ -47,6 +48,7 @@ impl Config {
                 },
                 accounts: accounts,
                 daemon: false,
+                log_path: "/var/log/srun.log".to_string(),
             };
             let display = path.display();
             let write_config = serde_yaml::to_string(&config).unwrap();

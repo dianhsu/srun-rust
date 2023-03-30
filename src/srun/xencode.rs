@@ -1,12 +1,18 @@
+fn ordat(msg: &str, idx: usize) -> usize {
+    let msg = msg.as_bytes();
+    if idx < msg.len() {
+        return msg[idx] as usize;
+    }
+    return 0;
+}
 fn sencode(msg: &str, key: bool) -> Vec<usize> {
     let mut pwd = vec![];
-    let msg = msg.as_bytes();
     for i in (0..msg.len()).step_by(4) {
         pwd.push(
-            msg[i] as usize
-                | (msg[i + 1] as usize) << 8
-                | (msg[i + 2] as usize) << 16
-                | (msg[i + 3] as usize) << 24,
+            ordat(&msg, i)
+                | ordat(&msg, i + 1) << 8
+                | ordat(&msg, i + 2) << 16
+                | ordat(&msg, i + 3) << 24,
         );
     }
     if key {
@@ -77,4 +83,16 @@ pub fn get_xencode(msg: &str, key: &str) -> String {
         q = q - 1;
     }
     lencode(&pwd, false).iter().map(|x| *x as char).collect()
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_get_xencode() {
+        let res =crate::srun::xencode::get_xencode("{\"username\":\"201626203044@cmcc\",\"password\":\"15879684798qq\",\"ip\":\"10.128.96.249\",\"acid\":\"1\",\"enc_ver\":\"srun_bx1\"}","e6843f26b8544327a3a25978dd3c5f89e6b745df1732993b88fe082c13a34cb9");
+        let hex_res = res.as_bytes().iter().map(|x| format!("{:02x}", x)).collect::<String>();
+        assert_eq!(
+            hex_res,
+            "66c292c3af6bc3a4753b40c2b7c29bc28a64c3ae18c294c2b9c3bcc3876f15c38f18c3a5c2b9632b0909326e3c7243c285c39860c29c6a16c2be41c39ec2a9c281195cc3b0c3adc2844c397ec38228c396386fc2ba6d0e6b0bc29939c288c392c3bcc28f604646c38b46c3a5c291c396c2866537c3a6c2a959c2ba0ac29bc292c2872663c28dc3b97727c39303c2a0c2a62ac29f4cc3a96004c38ec39a64c398c3a15e5644c2894c11531f");
+    }
 }

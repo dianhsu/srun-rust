@@ -607,6 +607,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_json"
+version = "1.0.95"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d721eca97ac802aa7777b701877c8004d950fc142651367300d21c1cc0194744"
+dependencies = [
+ "itoa",
+ "ryu",
+ "serde",
+]
+
+[[package]]
 name = "serde_yaml"
 version = "0.9.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -685,6 +696,7 @@ dependencies = [
  "rust-crypto",
  "serde",
  "serde_derive",
+ "serde_json",
  "serde_yaml",
  "sha-1",
  "sha1",
