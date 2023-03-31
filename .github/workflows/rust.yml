@@ -1,7 +1,6 @@
 name: Build Releases
 on:
-  release:
-    types: [published]
+  push:
 
 env:
   CARGO_TERM_COLOR: always
