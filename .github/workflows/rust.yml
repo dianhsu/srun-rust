@@ -54,7 +54,7 @@ jobs:
         run: |
           compile_target=${{ matrix.target }}
           compile_compress="-u"
-          cross build --target ${{ matrix.target }} --features $compile_compress 
+          cross build --target ${{ matrix.target }} --release
 
 
       - name: Upload Github Assets
