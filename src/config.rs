@@ -18,6 +18,7 @@ pub struct Basic {
     pub n: String,
     pub vtype: String,
     pub https: bool,
+    pub timeout: u64,
 }
 #[derive(Deserialize, Serialize)]
 pub struct Config {
@@ -45,6 +46,7 @@ impl Config {
                     n: "200".to_string(),
                     vtype: "1".to_string(),
                     https: false,
+                    timeout: 300,
                 },
                 accounts: accounts,
                 daemon: false,

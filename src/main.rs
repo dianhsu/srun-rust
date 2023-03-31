@@ -32,7 +32,7 @@ fn run(config_path: &str, action: &str) {
                     Ok(_) => {
                         println!("Success, daemonized");
                         loop {
-                            sleep(time::Duration::from_secs(5));
+                            sleep(time::Duration::from_secs(run_config.basic.timeout));
                         }
                     }
                     Err(e) => log::error!("Error, {}", e),
