@@ -19,12 +19,12 @@ pub fn get_ip_from_interface(interface: &str) -> String {
         for interface_item in default_net::get_interfaces() {
             let interface_name = interface_item.name;
             if let Some(mac_addr) = interface_item.mac_addr {
-                log::info!("interface: {} mac address: {}", interface_name, mac_addr);
+                log::debug!("interface: {} mac address: {}", interface_name, mac_addr);
                 if mac_addr.address().eq(&interface) || interface_name.eq(&interface) {
                     return format!("{:?}", interface_item.ipv4.first().unwrap().addr);
                 }
             } else {
-                log::info!("interface: {} failed to get mac address", interface_name);
+                log::debug!("interface: {} failed to get mac address", interface_name);
                 if interface_name.eq(&interface) {
                     return format!("{:?}", interface_item.ipv4.first().unwrap().addr);
                 }

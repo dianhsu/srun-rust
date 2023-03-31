@@ -35,7 +35,7 @@
 // 用库也一样
 use base64::{alphabet, engine, Engine as _};
 
-pub fn get_base64(value: &str) -> String {
+pub fn get_base64(value: &Vec<u8>) -> String {
     let alphabet =
         alphabet::Alphabet::new("LVoJPiCN2R8G90yg+hmFHuacZ1OWMnrsSTXkYpUq/3dlbfKwv6xztjI7DeBE45QA")
             .unwrap();
@@ -49,12 +49,17 @@ pub fn get_base64(value: &str) -> String {
     crazy_engine.encode(value)
 }
 
-
 #[cfg(test)]
-mod tests{
+mod tests {
     #[test]
-    fn test_get_base64(){
-        assert_eq!(crate::srun::base64::get_base64("132456"), "9F9x0JHI");
-        assert_eq!(crate::srun::base64::get_base64("1234567890"), "9F2z0JHI0zSe9L==");
+    fn test_get_base64() {
+        assert_eq!(
+            crate::srun::base64::get_base64(&"132456".as_bytes().to_vec()),
+            "9F9x0JHI"
+        );
+        assert_eq!(
+            crate::srun::base64::get_base64(&"1234567890".as_bytes().to_vec()),
+            "9F2z0JHI0zSe9L=="
+        );
     }
 }

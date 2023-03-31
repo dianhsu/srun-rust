@@ -15,8 +15,18 @@ impl Auth {
         }
     }
     fn login(&mut self) -> bool {
-        let (info, status) = self.info.login();
-        log::info!("{} login status: {}, \'{}\'", self.info.username, status, info);
+        let (_, status) = self.info.login();
+        log::info!("{} login status: {}", self.info.username, status);
+        return status;
+    }
+    fn logout(&mut self) -> bool {
+        let status = self.info.logout();
+        log::info!("{} logout status: {}", self.info.username, status);
+        return status;
+    }
+    fn status(&mut self) -> bool {
+        let status = self.info.status();
+        log::info!("{} status: {}", self.info.username, status);
         return status;
     }
 }
@@ -43,6 +53,24 @@ impl Client {
     pub fn login_all(&mut self) {
         for auth in self.auths.iter_mut() {
             auth.status = auth.login();
+        }
+    }
+    pub fn logout_all(&mut self) {
+        for auth in self.auths.iter_mut() {
+            let logout_status = auth.logout();
+            match logout_status {
+                true => {
+                    auth.status = false;
+                }
+                false => {
+                    auth.status = true;
+                }
+            }
+        }
+    }
+    pub fn status_all(&mut self) {
+        for auth in self.auths.iter_mut() {
+            auth.status = auth.status();
         }
     }
 }

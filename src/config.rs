@@ -48,7 +48,7 @@ impl Config {
                 },
                 accounts: accounts,
                 daemon: false,
-                log_path: "/var/log/srun.log".to_string(),
+                log_path: "/var/log/srun.log".to_string()
             };
             let display = path.display();
             let write_config = serde_yaml::to_string(&config).unwrap();
@@ -82,7 +82,7 @@ impl Config {
                     process::exit(102);
                 }
                 Ok(_) => {
-                    log::info!("successfully read from {}", path.display());
+                    log::debug!("successfully read from {}", path.display());
                 }
             }
             serde_yaml::from_str(s.as_str()).unwrap()
