@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-curl = "0.4.44"
+curl = {version = "0.4.44", features = ["rustls"], default_features = false}
 daemonize = "0.5.0"
 default-net = "0.14.1"
 regex = "1.7.3"
